@@ -1,4 +1,5 @@
 inputfile=dat/SBP-level0.txt
+maxmoves=100
 
 default: clean run
 
@@ -7,7 +8,7 @@ build:
 	javac -d bin `find src -name "*.java"`
 
 run: build
-	java -cp bin mwa29.cs510.Main $(inputfile)
+	java -cp bin mwa29.cs510.Main -file $(inputfile) -maxMoves $(maxmoves)
 
 clean:
 	@rm -fr bin
