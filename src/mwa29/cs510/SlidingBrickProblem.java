@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,9 +34,9 @@ public class SlidingBrickProblem {
 
 	private static class GameMove {
 
-		GameState beforeMove;
-		GamePiece pieceMoved;
-		Direction moveDirection;
+		private GameState beforeMove;
+		private GamePiece pieceMoved;
+		private Direction moveDirection;
 
 		private GameState afterMove;
 
@@ -50,28 +51,54 @@ public class SlidingBrickProblem {
 			final int height = beforeMove.getHeight();
 			final int width = beforeMove.getWidth();
 			final int[][] gameBoard = beforeMove.getGameBoard();
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					if (pieceMove.getPieceNumber() == gameBoard[x][y]) {
-						final int dx = moveDirection.getDx();
-						final int dy = moveDirection.getDy();
-						if (EMPTY != gameBoard[x + dx][y + dy]
-								&& pieceMove.getPieceNumber() != gameBoard[x
-										+ dx][y + dy]) {
-							throw new SlidingBrickProblemRuntimeException(
-									String.format(
-											"Illegal move: moving piece '%d' '%s' to '%d','%d' - '%d'",
-											pieceMove.getPieceNumber(),
-											moveDirection.toString(), x + dx, y
-													+ dy, gameBoard[x + dx][y
-													+ dy]));
-						} else {
-							// Make the move
-							afterMove.gameBoard[x + dx][y + dy] = pieceMove.pieceNumber;
-							// FIXME: Not sure if this account for wider pieces
-							afterMove.gameBoard[x][y] = EMPTY;
-						}
+
+			// When moving a piece up or left, traverse board from top left to
+			// bottom right
+			switch (moveDirection) {
+			case up:
+			case left:
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						checkAndApplyMove(pieceMove, moveDirection, gameBoard,
+								y, x);
 					}
+				}
+				break;
+			// When moving a piece down or right, traverse board from bottom
+			// right to top left
+			case down:
+			case right:
+				for (int y = height - 1; y >= 0; y--) {
+					for (int x = width - 1; x >= 0; x--) {
+						checkAndApplyMove(pieceMove, moveDirection, gameBoard,
+								y, x);
+					}
+				}
+				break;
+			}
+		}
+
+		private void checkAndApplyMove(GamePiece pieceMove,
+				Direction moveDirection, final int[][] gameBoard, int y, int x) {
+			if (pieceMove.getPieceNumber() == gameBoard[x][y]) {
+				final int dx = moveDirection.getDx();
+				final int dy = moveDirection.getDy();
+				if (EMPTY == gameBoard[x + dx][y + dy]
+						|| pieceMove.getPieceNumber() == gameBoard[x + dx][y
+								+ dy] // This check may not be needed
+						|| (GOAL == gameBoard[x + dx][y + dy] && pieceMove
+								.getPieceNumber() == MASTER)) {
+					// Make the move
+					afterMove.gameBoard[x + dx][y + dy] = pieceMove.pieceNumber;
+					afterMove.gameBoard[x][y] = EMPTY;
+
+				} else {
+					throw new SlidingBrickProblemRuntimeException(
+							String.format(
+									"Illegal move: moving piece '%d' '%s' to '%d','%d' - '%d'",
+									pieceMove.getPieceNumber(),
+									moveDirection.toString(), x + dx, y + dy,
+									gameBoard[x + dx][y + dy]));
 				}
 			}
 		}
@@ -98,14 +125,15 @@ public class SlidingBrickProblem {
 					+ pieceMoved + ", moveDirection=" + moveDirection
 					+ ", afterMove=" + afterMove + "]";
 		}
+
+		public String prettyToString() {
+			return String.format("(%d,%s)", pieceMoved.getPieceNumber(),
+					moveDirection.toString());
+		}
 	}
 
 	private static class GamePiece {
 		private int pieceNumber;
-
-		public GamePiece(GamePiece that) {
-			this.pieceNumber = that.pieceNumber;
-		}
 
 		public GamePiece(int pieceNumber) {
 			super();
@@ -350,9 +378,48 @@ public class SlidingBrickProblem {
 	}
 
 	public static void randomWalks(GameState gameState, int N) {
-		for (GameMove g : gameState.getAllMoves()) {
-			debug(g);
+		Random random = new Random();
+		boolean solved = false;
+		GameState currentState = gameState.cloneGameState();
+
+		gameState.outputGameState();
+
+		int moveCount = 0;
+		for (moveCount = 0; moveCount < N && !solved; moveCount++) {
+			// 1) generate all the moves that can be generated in the board
+			List<GameMove> allMoves = currentState.getAllMoves();
+
+			debug("move count " + allMoves.size());
+
+			// 2) select one at random
+			int randomIndex = random.nextInt(allMoves.size());
+			GameMove randomMove = allMoves.get(randomIndex);
+
+			// 3) execute it
+			currentState = currentState.applyMoveCloning(randomMove);
+
+			// 4) normalize the resulting game state
+			currentState.normalize();
+
+			// 5) if we have reached the goal, or if we have executed N
+			// moves, stop; otherwise, go back to 1.
+			if (currentState.isSolved()) {
+				solved = true;
+			}
+
+			System.out.println(String.format("\n%s\n",
+					randomMove.prettyToString()));
+			currentState.outputGameState();
 		}
+
+		if (solved) {
+			System.out.println(String.format(
+					"\nPuzzle was solved on move '%d'\n", moveCount + 1));
+		} else {
+			System.out.println(String.format(
+					"\nThe puzzle could not be solved under '%d' moves'\n", N));
+		}
+
 	}
 
 	GameState initialGameState;
@@ -365,7 +432,7 @@ public class SlidingBrickProblem {
 
 	private static final int MASTER = 2;
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	public SlidingBrickProblem(File gameFile) {
 		initialGameState = new GameState(gameFile);
