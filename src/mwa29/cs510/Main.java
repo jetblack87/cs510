@@ -5,8 +5,6 @@
 package mwa29.cs510;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
 
 /**
  * The main entry into the program
