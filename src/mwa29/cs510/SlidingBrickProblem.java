@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -105,6 +106,7 @@ public class SlidingBrickProblem {
 			this.pieceMoved = pieceMove;
 			this.moveDirection = moveDirection;
 			this.afterMove = beforeMove.cloneGameState();
+			this.afterMove.setMove(this);
 
 			// Check to see if this is a legal move:
 			final int height = beforeMove.getHeight();
@@ -299,6 +301,11 @@ public class SlidingBrickProblem {
 		private int maxPiece = Integer.MIN_VALUE;
 
 		/**
+		 * The move that made this state (null if it doesn't exist)
+		 */
+		private GameMove move = null;
+
+		/**
 		 * Constructs a {@link GameState} using the given {@link File}
 		 * 
 		 * @param gameFile
@@ -311,12 +318,32 @@ public class SlidingBrickProblem {
 		}
 
 		/**
+		 * Gets the move
+		 * 
+		 * @return the move
+		 */
+		public GameMove getMove() {
+			return move;
+		}
+
+		/**
+		 * Sets the move
+		 * 
+		 * @param gameMove
+		 *            the move {@link GameMove}
+		 */
+		public void setMove(GameMove gameMove) {
+			this.move = gameMove;
+		}
+
+		/**
 		 * Copy constructor
 		 * 
 		 * @param gameState
 		 *            the {@link GameState} to copy
 		 */
 		public GameState(GameState gameState) {
+			this.move = gameState.getMove();
 			final int width = gameState.getWidth();
 			final int height = gameState.getHeight();
 			gameBoard = new int[width][height];
@@ -383,6 +410,14 @@ public class SlidingBrickProblem {
 				}
 			}
 			return equal;
+		}
+
+		@Override
+		public boolean equals(Object that) {
+			if (!(that instanceof GameState)) {
+				return false;
+			}
+			return compare((GameState) that);
 		}
 
 		/**
@@ -662,6 +697,122 @@ public class SlidingBrickProblem {
 					"\nThe puzzle could not be solved under '%d' moves'\n", N));
 		}
 
+	}
+
+	/**
+	 * Performs a breadth-first search strategy to solve the puzzle
+	 * 
+	 * @param gameState
+	 *            the {@link GameState} to solve
+	 */
+	public static void breadthFirst(GameState gameState) {
+		int nodesExplored = 0;
+		boolean found = false;
+		LinkedList<GameState> Q = new LinkedList<GameState>();
+		LinkedList<GameState> V = new LinkedList<GameState>();
+		Q.add(gameState);
+		V.add(gameState);
+
+		while (!Q.isEmpty()) {
+			GameState currState = Q.removeLast();
+			nodesExplored++;
+			if (currState.isSolved()) {
+				found = true;
+
+				LinkedList<GameMove> successPath = new LinkedList<GameMove>();
+				GameMove move = currState.getMove();
+				while (null != move) {
+					successPath.push(move);
+					move = move.beforeMove.getMove();
+				}
+
+				for (GameMove currMove : successPath) {
+					System.out.println(currMove.prettyToString());
+				}
+
+				currState.outputGameState();
+				System.out.println("Number of nodes explored: " + nodesExplored);
+				System.out.println("Solution length: " + successPath.size());
+				break;
+			}
+			for (GameMove move : currState.getAllMoves()) {
+				GameState nextState = currState.applyMoveCloning(move);
+				if (!V.contains(nextState)) {
+					V.add(nextState);
+					Q.push(nextState);
+				}
+			}
+		}
+
+		if (!found) {
+			System.err.println("No successful paths found");
+		}
+	}
+
+	/**
+	 * Recursive implementation of depth first search
+	 * @param gameState the initial {@link GameState}
+	 * @param maxDepth the deepest search (0 can be used for infinite)
+	 * @return true if the puzzle was solved, false otherwise
+	 */
+	public static boolean depthFirstRecurse(GameState gameState, int maxDepth) {
+		final List<GameState> discovered = new LinkedList<GameState>();
+		GameState success = depthFirstRecurseAux(gameState, maxDepth, 0,
+				discovered);
+
+		if (null != success) {
+			LinkedList<GameMove> successPath = new LinkedList<GameMove>();
+			GameMove move = success.getMove();
+			while (null != move) {
+				successPath.push(move);
+				move = move.beforeMove.getMove();
+			}
+
+			for (GameMove currMove : successPath) {
+				System.out.println(currMove.prettyToString());
+			}
+
+			success.outputGameState();
+			
+			System.out.println("Number of nodes explored: " + nodesExplored);
+			System.out.println("Solution length: " + successPath.size());
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Auxiliary method for depthFirstRecurse
+	 * @param gameState the initial {@link GameState}
+	 * @param maxDepth the deepest search (0 can be used for infinite)
+	 * @param currDepth the current depth
+	 * @param discovered the list of discovered states
+	 * @return the solved state
+	 */
+	private static int nodesExplored;
+	private static GameState depthFirstRecurseAux(final GameState gameState,
+			final int maxDepth, final int currDepth,
+			final List<GameState> discovered) {
+		nodesExplored++;
+		if (gameState.isSolved()) {
+			return gameState;
+		}
+		if (maxDepth != 0 && currDepth > maxDepth) {
+			return null;
+		}
+		for (GameMove move : gameState.getAllMoves()) {
+			GameState next = gameState.applyMoveCloning(move);
+			if (!discovered.contains(next)) {
+				discovered.add(next);
+				GameState success = depthFirstRecurseAux(next, maxDepth,
+						currDepth + 1, discovered);
+				if (null != success) {
+					return success;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
