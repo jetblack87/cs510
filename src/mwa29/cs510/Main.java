@@ -32,7 +32,7 @@ public class Main {
 			}
 		}
 
-		Instant start = Instant.now();
+		long startTime = System.nanoTime();
 		SlidingBrickProblem sbp = new SlidingBrickProblem(new File(filePath));
 		switch (solveType) {
 		case RANDOM_WALK:
@@ -53,8 +53,9 @@ public class Main {
 			}
 			break;
 		}
-		Instant stop = Instant.now();
-		System.out.println("Duration: " + Duration.between(start, stop));
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println("Duration (milliseconds): " + duration / 1000000);
 	}
 
 	private static String filePath = "dat/hw1/SBP-level0.txt";
