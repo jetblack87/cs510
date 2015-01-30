@@ -43,11 +43,16 @@ public class Main {
 			SlidingBrickProblem.depthFirstRecurse(sbp.initialGameState, 0);
 			break;
 		case ITERATIVE_DEPTH_FIRST:
+			boolean found = false;
 			for (int i = 1; i < maxMoves; i++) {
 				if (SlidingBrickProblem.depthFirstRecurse(sbp.initialGameState,
 						i)) {
+					found = true;
 					break;
 				}
+			}
+			if (!found) {
+				System.err.println("No solution found with max depth of: " + maxMoves);
 			}
 			break;
 		}
