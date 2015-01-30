@@ -737,8 +737,10 @@ public class SlidingBrickProblem {
 			}
 			for (GameMove move : currState.getAllMoves()) {
 				GameState nextState = currState.applyMoveCloning(move);
-				if (!V.contains(nextState)) {
-					V.add(nextState);
+				GameState normalized = nextState.cloneGameState();
+				normalized.normalize();
+				if (!V.contains(normalized)) {
+					V.add(normalized);
 					Q.push(nextState);
 				}
 			}
@@ -803,8 +805,10 @@ public class SlidingBrickProblem {
 		}
 		for (GameMove move : gameState.getAllMoves()) {
 			GameState next = gameState.applyMoveCloning(move);
-			if (!discovered.contains(next)) {
-				discovered.add(next);
+			GameState normalized = next.cloneGameState();
+			normalized.normalize();
+			if (!discovered.contains(normalized)) {
+				discovered.add(normalized);
 				GameState success = depthFirstRecurseAux(next, maxDepth,
 						currDepth + 1, discovered);
 				if (null != success) {
