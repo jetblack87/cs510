@@ -29,3 +29,16 @@ hw2-extra-credit:
 	make run maxmoves=1000 solvetype=ITERATIVE_DEPTH_FIRST inputfile=dat/hw2/SBP-level1.txt
 	make run maxmoves=1000 solvetype=ITERATIVE_DEPTH_FIRST inputfile=dat/hw2/SBP-level2.txt
 	make run maxmoves=1000 solvetype=ITERATIVE_DEPTH_FIRST inputfile=dat/hw2/SBP-level3.txt
+
+hw3:
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-level0.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-level1.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-level2.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-level3.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level1.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level2.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level3.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level4.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level5.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level6.txt
+	make run solvetype=A_STAR inputfile=dat/hw3/SBP-bricks-level7.txt

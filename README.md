@@ -17,13 +17,16 @@ RANDOM_WALK (from hw1)
 BREATH_FIRST (from hw2)
 DEPTH_FIRST (from hw2)
 ITERATIVE_DEPTH_FIRST (extra credit for hw2)
+A_STAR (from hw3)
 
 The 'maxmoves' option only is applied to RANDOM_WALK and ITERATIVE_DEPTH_FIRST algorithms.
 
 Additional targets for hw2:
-Run for hw2: `make hw2` (output was used to generate output-part2.txt)
-Run for hw2 extra credit: `make hw2-extra-credit` (output was used to generate output-part3.txt)
+Run for hw2: `make hw2`
+Run for hw2 extra credit: `make hw2-extra-credit`
 
+Additional targets for hw3:
+Run for hw4: `make hw3` (output was used to generate output-part2.txt)
 
 
 These steps have been tested on tux.
