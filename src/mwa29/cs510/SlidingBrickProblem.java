@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -136,6 +138,69 @@ public class SlidingBrickProblem {
 					}
 				}
 				break;
+			}
+		}
+
+		public GameMove(GameState beforeMove, GameState afterMove) {
+			this.beforeMove = beforeMove;
+			this.afterMove = afterMove;
+
+			final int height = beforeMove.getHeight();
+			final int width = beforeMove.getWidth();
+			final int[][] beforeGameBoard = beforeMove.getGameBoard();
+			final int[][] afterGameBoard = afterMove.getGameBoard();
+
+			for (int y = 0; y < height && null == this.pieceMoved; y++) {
+				for (int x = 0; x < width && null == this.pieceMoved; x++) {
+					if (beforeGameBoard[x][y] != afterGameBoard[x][y]) {
+						if (beforeGameBoard[x][y] != EMPTY
+								&& beforeGameBoard[x][y] != WALL
+								&& beforeGameBoard[x][y] != GOAL) {
+							this.pieceMoved = new GamePiece(
+									beforeGameBoard[x][y]);
+						} else if (afterGameBoard[x][y] != EMPTY
+								&& afterGameBoard[x][y] != WALL
+								&& afterGameBoard[x][y] != GOAL) {
+							this.pieceMoved = new GamePiece(
+									afterGameBoard[x][y]);
+						}
+					}
+				}
+			}
+
+			if (this.pieceMoved == null) {
+				throw new SlidingBrickProblemRuntimeException(
+						"Could not find the piece being moved.");
+			}
+
+			// System.out.println(this.pieceMoved.getPieceNumber());
+			// this.beforeMove.outputGameState();
+			// this.afterMove.outputGameState();
+
+			for (int y = 0; y < height && null == this.moveDirection; y++) {
+				for (int x = 0; x < width && null == this.moveDirection; x++) {
+					try {
+						if ((beforeGameBoard[x][y] == EMPTY || beforeGameBoard[x][y] == GOAL)
+								&& afterGameBoard[x][y] == this.pieceMoved
+										.getPieceNumber()) {
+							if (afterGameBoard[x][y + 1] == EMPTY) {
+								this.moveDirection = Direction.up;
+							} else if (afterGameBoard[x][y - 1] == EMPTY) {
+								this.moveDirection = Direction.down;
+							} else if (afterGameBoard[x + 1][y] == EMPTY) {
+								this.moveDirection = Direction.left;
+							} else if (afterGameBoard[x - 1][y] == EMPTY) {
+								this.moveDirection = Direction.right;
+							}
+						}
+					} catch (ArrayIndexOutOfBoundsException e) {
+					}
+				}
+			}
+
+			if (null == this.moveDirection) {
+				throw new SlidingBrickProblemRuntimeException(
+						"Could not find the move direction.");
 			}
 		}
 
@@ -630,7 +695,74 @@ public class SlidingBrickProblem {
 					}
 				}
 			}
+		}
 
+		/**
+		 * The heuristic for this state based on the Manhattan distance between
+		 * the master brick and the goal.
+		 * 
+		 * @return The heuristic value
+		 */
+		public int manhattanHeuristic() {
+			int goalx = 0;
+			int goaly = 0;
+			int masterx = 0;
+			int mastery = 0;
+
+			final int height = this.getHeight();
+			final int width = this.getWidth();
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					if (gameBoard[x][y] == GOAL) {
+						goalx = x;
+						goaly = y;
+					} else if (gameBoard[x][y] == MASTER) {
+						masterx = x;
+						mastery = y;
+					}
+				}
+			}
+
+			return Math.abs(goalx - masterx) + Math.abs(goaly - mastery);
+		}
+	}
+
+	private static class GameNode {
+		private GameState gameState;
+		private GameNode parentNode;
+		private int currentCost;
+		private int currentHeuristic;
+
+		public GameState getGameState() {
+			return gameState;
+		}
+
+		public void setGameState(GameState gameState) {
+			this.gameState = gameState;
+		}
+
+		public GameNode getParentNode() {
+			return parentNode;
+		}
+
+		public void setParentNode(GameNode parentState) {
+			this.parentNode = parentState;
+		}
+
+		public int getCurrentCost() {
+			return currentCost;
+		}
+
+		public void setCurrentCost(int currentCost) {
+			this.currentCost = currentCost;
+		}
+
+		public int getCurrentHeuristic() {
+			return currentHeuristic;
+		}
+
+		public void setCurrentHeuristic(int currentHeuristic) {
+			this.currentHeuristic = currentHeuristic;
 		}
 	}
 
@@ -731,7 +863,8 @@ public class SlidingBrickProblem {
 				}
 
 				currState.outputGameState();
-				System.out.println("Number of nodes explored: " + nodesExplored);
+				System.out
+						.println("Number of nodes explored: " + nodesExplored);
 				System.out.println("Solution length: " + successPath.size());
 				break;
 			}
@@ -753,8 +886,11 @@ public class SlidingBrickProblem {
 
 	/**
 	 * Recursive implementation of depth first search
-	 * @param gameState the initial {@link GameState}
-	 * @param maxDepth the deepest search (0 can be used for infinite)
+	 * 
+	 * @param gameState
+	 *            the initial {@link GameState}
+	 * @param maxDepth
+	 *            the deepest search (0 can be used for infinite)
 	 * @return true if the puzzle was solved, false otherwise
 	 */
 	public static boolean depthFirstRecurse(GameState gameState, int maxDepth) {
@@ -775,7 +911,7 @@ public class SlidingBrickProblem {
 			}
 
 			success.outputGameState();
-			
+
 			System.out.println("Number of nodes explored: " + nodesExplored);
 			System.out.println("Solution length: " + successPath.size());
 			return true;
@@ -784,15 +920,20 @@ public class SlidingBrickProblem {
 		}
 	}
 
+	private static int nodesExplored;
 	/**
 	 * Auxiliary method for depthFirstRecurse
-	 * @param gameState the initial {@link GameState}
-	 * @param maxDepth the deepest search (0 can be used for infinite)
-	 * @param currDepth the current depth
-	 * @param discovered the list of discovered states
+	 * 
+	 * @param gameState
+	 *            the initial {@link GameState}
+	 * @param maxDepth
+	 *            the deepest search (0 can be used for infinite)
+	 * @param currDepth
+	 *            the current depth
+	 * @param discovered
+	 *            the list of discovered states
 	 * @return the solved state
 	 */
-	private static int nodesExplored;
 	private static GameState depthFirstRecurseAux(final GameState gameState,
 			final int maxDepth, final int currDepth,
 			final List<GameState> discovered) {
@@ -817,6 +958,76 @@ public class SlidingBrickProblem {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Performs A* search algorithm to solve the puzzle
+	 * 
+	 * @param gameState
+	 *            the {@link GameState} to solve
+	 */
+	public static void aStar(GameState gameState) {
+		GameNode start = new GameNode();
+		start.setGameState(gameState);
+		start.setCurrentHeuristic(gameState.manhattanHeuristic());
+		start.setCurrentCost(0);
+		LinkedList<GameNode> open = new LinkedList<GameNode>();
+		open.add(start);
+		LinkedList<GameState> closed = new LinkedList<GameState>();
+		boolean found = false;
+		while (!open.isEmpty()) {
+			Collections.sort(open, new Comparator<GameNode>() {
+				@Override
+				public int compare(GameNode o1, GameNode o2) {
+					return Integer.compare(
+							o1.getCurrentHeuristic() + o1.getCurrentCost(),
+							o2.getCurrentHeuristic() + o2.getCurrentCost());
+				}
+			});
+			
+			GameNode n = open.remove();
+			if (n.getGameState().isSolved()) {
+				found = true;
+
+				LinkedList<GameMove> successPath = new LinkedList<GameMove>();
+				{
+					GameNode current = n;
+					GameNode next = n.getParentNode();
+					while (null != next) {
+						successPath.push(new GameMove(next.getGameState(),
+								current.getGameState()));
+						current = next;
+						next = current.getParentNode();
+					}
+				}
+
+				for (GameMove currNode : successPath) {
+					System.out.println(currNode.prettyToString());
+				}
+
+				n.getGameState().outputGameState();
+				break;
+			} else {
+				closed.add(n.getGameState());
+				for (GameMove move : n.getGameState().getAllMoves()) {
+					GameState normalized = move.getAfterMove().cloneGameState();
+					normalized.normalize();
+					if (!closed.contains(normalized)) {
+						GameNode m = new GameNode();
+						m.setGameState(move.getAfterMove());
+						m.setParentNode(n);
+						m.setCurrentCost(n.getCurrentCost() + 1);
+						m.setCurrentHeuristic(m.getGameState()
+								.manhattanHeuristic());
+						open.add(m);
+					}
+				}
+			}
+		}
+
+		if (!found) {
+			System.err.println("No successful paths found");
+		}
 	}
 
 	/**

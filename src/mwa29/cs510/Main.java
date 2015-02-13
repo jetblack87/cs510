@@ -12,7 +12,7 @@ import java.io.File;
 public class Main {
 
 	private enum SolveType {
-		RANDOM_WALK, BREADTH_FIRST, DEPTH_FIRST, ITERATIVE_DEPTH_FIRST;
+		RANDOM_WALK, BREADTH_FIRST, DEPTH_FIRST, ITERATIVE_DEPTH_FIRST, A_STAR;
 	}
 
 	/**
@@ -52,8 +52,12 @@ public class Main {
 				}
 			}
 			if (!found) {
-				System.err.println("No solution found with max depth of: " + maxMoves);
+				System.err.println("No solution found with max depth of: "
+						+ maxMoves);
 			}
+			break;
+		case A_STAR:
+			SlidingBrickProblem.aStar(sbp.initialGameState);
 			break;
 		}
 		long endTime = System.nanoTime();
