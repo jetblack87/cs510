@@ -180,7 +180,9 @@ public class SlidingBrickProblem {
 			for (int y = 0; y < height && null == this.moveDirection; y++) {
 				for (int x = 0; x < width && null == this.moveDirection; x++) {
 					try {
-						if ((beforeGameBoard[x][y] == EMPTY || beforeGameBoard[x][y] == GOAL)
+						if ((beforeGameBoard[x][y] == EMPTY
+								|| beforeGameBoard[x][y] == GOAL || beforeGameBoard[x][y] == this.pieceMoved
+								.getPieceNumber())
 								&& afterGameBoard[x][y] == this.pieceMoved
 										.getPieceNumber()) {
 							if (afterGameBoard[x][y + 1] == EMPTY) {
@@ -921,6 +923,7 @@ public class SlidingBrickProblem {
 	}
 
 	private static int nodesExplored;
+
 	/**
 	 * Auxiliary method for depthFirstRecurse
 	 * 
@@ -960,6 +963,7 @@ public class SlidingBrickProblem {
 		return null;
 	}
 
+	private static int aStarNodesExplored;
 	/**
 	 * Performs A* search algorithm to solve the puzzle
 	 * 
@@ -984,8 +988,9 @@ public class SlidingBrickProblem {
 							o2.getCurrentHeuristic() + o2.getCurrentCost());
 				}
 			});
-			
+
 			GameNode n = open.remove();
+			aStarNodesExplored++;
 			if (n.getGameState().isSolved()) {
 				found = true;
 
@@ -1006,9 +1011,14 @@ public class SlidingBrickProblem {
 				}
 
 				n.getGameState().outputGameState();
+				System.out
+						.println("Number of nodes explored: " + aStarNodesExplored);
+				System.out.println("Solution length: " + successPath.size());
 				break;
 			} else {
-				closed.add(n.getGameState());
+				GameState nNormalized = n.getGameState().cloneGameState();
+				nNormalized.normalize();
+				closed.add(nNormalized);
 				for (GameMove move : n.getGameState().getAllMoves()) {
 					GameState normalized = move.getAfterMove().cloneGameState();
 					normalized.normalize();
