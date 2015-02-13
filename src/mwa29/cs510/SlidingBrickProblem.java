@@ -989,7 +989,7 @@ public class SlidingBrickProblem {
 				}
 			});
 
-			GameNode n = open.remove();
+			GameNode n = open.removeLast();
 			aStarNodesExplored++;
 			if (n.getGameState().isSolved()) {
 				found = true;
@@ -1020,9 +1020,9 @@ public class SlidingBrickProblem {
 				nNormalized.normalize();
 				closed.add(nNormalized);
 				for (GameMove move : n.getGameState().getAllMoves()) {
-					GameState normalized = move.getAfterMove().cloneGameState();
-					normalized.normalize();
-					if (!closed.contains(normalized)) {
+					GameState nextNormalized = move.getAfterMove().cloneGameState();
+					nextNormalized.normalize();
+					if (!closed.contains(nextNormalized)) {
 						GameNode m = new GameNode();
 						m.setGameState(move.getAfterMove());
 						m.setParentNode(n);
