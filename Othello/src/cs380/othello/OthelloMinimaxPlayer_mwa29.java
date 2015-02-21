@@ -90,7 +90,7 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 		} else {
 			int v = Integer.MIN_VALUE;
 			for (final OthelloMove a : state.generateMoves()) {
-				v = Integer.max(
+				v = Integer_max(
 						v,
 						playerScoreValue(
 								currentPlayer,
@@ -120,7 +120,7 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 		} else {
 			int v = Integer.MAX_VALUE;
 			for (final OthelloMove a : state.generateMoves()) {
-				v = Integer.min(
+				v = Integer_min(
 						v,
 						playerScoreValue(
 								currentPlayer,
@@ -148,5 +148,31 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 		} else {
 			return score;
 		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Integer#min(int, int)
+	 */
+	private int Integer_min(int one, int two) {
+		if (one < two) {
+			return one;
+		} else {
+			return two;
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Integer#max(int, int)
+	 */
+	private int Integer_max(int one, int two) {
+		if (one > two) {
+			return one;
+		} else {
+			return two;
+		}		
 	}
 }
