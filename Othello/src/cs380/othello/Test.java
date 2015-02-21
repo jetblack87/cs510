@@ -1,5 +1,6 @@
 package cs380.othello;
 
+
 /**
  *
  * @author santi
@@ -11,7 +12,7 @@ public class Test {
         // Create the game state with the initial position for an 8x8 board:
         OthelloState state = new OthelloState(8);
         OthelloPlayer players[] = {new OthelloRandomPlayer(),
-                                   new OthelloRandomPlayer()};
+                                   new OthelloMinimaxPlayer_mwa29(5)};
         
         do{
             // Display the current state in the console:
