@@ -18,7 +18,7 @@ public class Test {
 			} else if (args[i].equals("-playerone")) {
 				playerone = getPlayer(args[i + 1]);
 			} else if (args[i].equals("-playertwo")) {
-				playerone = getPlayer(args[i + 1]);
+				playertwo = getPlayer(args[i + 1]);
 			}
 		}
 
