@@ -65,6 +65,12 @@ public class Test {
 			} else {
 				return new OthelloMinimaxPlayer_mwa29();
 			}
+		} else if (playerType.equals("alphabeta")) {
+			if (maxDepth > Integer.MIN_VALUE) {
+				return new OthelloAlphaBetaPlayer_mwa29(maxDepth);
+			} else {
+				return new OthelloAlphaBetaPlayer_mwa29();
+			}
 		} else {
 			throw new RuntimeException("Unknown type supplied: " + playerType);
 		}

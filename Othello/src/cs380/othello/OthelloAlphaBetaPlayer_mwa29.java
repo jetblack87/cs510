@@ -1,22 +1,12 @@
 package cs380.othello;
 
-public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
-
-	/**
-	 * Indicates infinite max depth
-	 */
-	public static final int INFINITE = 0;
-
-	/**
-	 * The maximum depth to recurse. Defaults to INFINITE.
-	 */
-	protected int maxDepth = INFINITE;
+public class OthelloAlphaBetaPlayer_mwa29 extends OthelloMinimaxPlayer_mwa29 {
 
 	/**
 	 * The default constructor
 	 */
-	public OthelloMinimaxPlayer_mwa29() {
-		// Default constructor
+	public OthelloAlphaBetaPlayer_mwa29() {
+		super();
 	}
 
 	/**
@@ -26,27 +16,18 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 	 * @param maxDepth
 	 *            The highest depth this player will search.
 	 */
-	public OthelloMinimaxPlayer_mwa29(final int maxDepth) {
-		this.maxDepth = maxDepth;
+	public OthelloAlphaBetaPlayer_mwa29(int maxDepth) {
+		super(maxDepth);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see cs380.othello.OthelloPlayer#getMove(cs380.othello.OthelloState)
+	 * @see
+	 * cs380.othello.OthelloMinimaxPlayer_mwa29#minimaxDecision(cs380.othello
+	 * .OthelloState)
 	 */
 	@Override
-	public OthelloMove getMove(final OthelloState state) {
-		return minimaxDecision(state);
-	}
-
-	/**
-	 * The main entrance to the minimax search.
-	 * 
-	 * @param state
-	 *            The initial state
-	 * @return The move to take
-	 */
 	protected OthelloMove minimaxDecision(final OthelloState state) {
 		OthelloMove returnMove = null;
 		int returnMoveScore = Integer.MIN_VALUE;
@@ -61,7 +42,8 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 				final int nextMoveScore = Helper.playerScoreValue(
 						state.nextPlayerToMove,
 						minValue(state.applyMoveCloning(a),
-								state.nextPlayerToMove, 0));
+								state.nextPlayerToMove, 0, returnMoveScore,
+								Integer.MAX_VALUE));
 				if (nextMoveScore > returnMoveScore) {
 					returnMove = a;
 					returnMoveScore = nextMoveScore;
@@ -75,16 +57,21 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 	/**
 	 * The max-value portion of the minimax search
 	 * 
+	 * Performs alpha-beta pruning
+	 * 
 	 * @param state
 	 *            The current state
 	 * @param currentPlayer
 	 *            The player that is making the move
 	 * @param currentDepth
 	 *            The current depth of the search
+	 * @param currentMin
+	 *            The current minimum value found in the preceding minValue
+	 *            processing
 	 * @return The maximized score of the min-values for all subsequent moves
 	 */
 	private int maxValue(final OthelloState state, final int currentPlayer,
-			final int currentDepth) {
+			final int currentDepth, int alpha, int beta) {
 		if (state.gameOver()
 				|| (INFINITE != maxDepth && currentDepth > maxDepth)) {
 			return state.score();
@@ -94,7 +81,13 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 				v = Helper.Integer_max(v, Helper.playerScoreValue(
 						currentPlayer,
 						minValue(state.applyMoveCloning(a), currentPlayer,
-								currentDepth + 1)));
+								currentDepth + 1, alpha, beta)));
+
+				// Perform pruning
+				alpha = Helper.Integer_max(alpha, v);
+				if (beta <= alpha) {
+					return v;
+				}
 			}
 			return v;
 		}
@@ -103,16 +96,21 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 	/**
 	 * The min-value portion of the minimax search
 	 * 
+	 * Performs alpha-beta pruning
+	 * 
 	 * @param state
 	 *            The current state
 	 * @param currentPlayer
 	 *            The player that is making the move
 	 * @param currentDepth
 	 *            The current depth of the search
+	 * @param currentMax
+	 *            The current maximum value found in the preceding maxValue
+	 *            processing
 	 * @return The minimized score of the max-values for all subsequent moves
 	 */
 	private int minValue(final OthelloState state, final int currentPlayer,
-			final int currentDepth) {
+			final int currentDepth, int alpha, int beta) {
 		if (state.gameOver()
 				|| (INFINITE != maxDepth && currentDepth > maxDepth)) {
 			return state.score();
@@ -122,7 +120,13 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 				v = Helper.Integer_min(v, Helper.playerScoreValue(
 						currentPlayer,
 						maxValue(state.applyMoveCloning(a), currentPlayer,
-								currentDepth + 1)));
+								currentDepth + 1, alpha, beta)));
+
+				// Perform pruning
+				beta = Helper.Integer_min(beta, v);
+				if (beta <= alpha) {
+					return v;
+				}
 			}
 			return v;
 		}
