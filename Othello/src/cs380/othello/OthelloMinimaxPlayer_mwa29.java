@@ -1,9 +1,5 @@
 package cs380.othello;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 
 	/**
@@ -73,6 +69,17 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 		return returnMove;
 	}
 
+	/**
+	 * Performs minimax algorithm
+	 * 
+	 * @param state
+	 *            the current state
+	 * @param currentDepth
+	 *            the current depth
+	 * @param maximizingPlayer
+	 *            whether this is being called for the maximizing player
+	 * @return the heuristic score
+	 */
 	private int minimax(OthelloState state, int currentDepth,
 			boolean maximizingPlayer) {
 		if (currentDepth == 0 || state.gameOver()) {
