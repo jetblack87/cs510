@@ -71,6 +71,9 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 
 	/**
 	 * Performs minimax algorithm
+	 *
+	 * Based on the pseudocode on the minimax Wikipedia page:
+	 * https://en.wikipedia.org/wiki/Minimax
 	 * 
 	 * @param state
 	 *            the current state
