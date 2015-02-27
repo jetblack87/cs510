@@ -53,21 +53,27 @@ public class Test {
 	private static OthelloPlayer getPlayer(String playerString) {
 		String splitString[] = playerString.split(":");
 		String playerType = splitString[0];
-		int maxDepth = Integer.MIN_VALUE;
+		int numberArgument = Integer.MIN_VALUE;
 		if (splitString.length > 1) {
-			maxDepth = Integer.parseInt(splitString[1]);
+			numberArgument = Integer.parseInt(splitString[1]);
 		}
 		if (playerType.equals("random")) {
 			return new OthelloRandomPlayer();
 		} else if (playerType.equals("minimax")) {
-			if (maxDepth > Integer.MIN_VALUE) {
-				return new OthelloMinimaxPlayer_mwa29(maxDepth);
+			if (numberArgument > Integer.MIN_VALUE) {
+				return new OthelloMinimaxPlayer_mwa29(numberArgument);
 			} else {
 				return new OthelloMinimaxPlayer_mwa29();
 			}
 		} else if (playerType.equals("alphabeta")) {
-			if (maxDepth > Integer.MIN_VALUE) {
-				return new OthelloAlphaBetaPlayer_mwa29(maxDepth);
+			if (numberArgument > Integer.MIN_VALUE) {
+				return new OthelloAlphaBetaPlayer_mwa29(numberArgument);
+			} else {
+				return new OthelloAlphaBetaPlayer_mwa29();
+			}
+		} else if (playerType.equals("tournament")) {
+			if (numberArgument > Integer.MIN_VALUE) {
+				return new OthelloTournamentPlayer_mwa29(numberArgument);
 			} else {
 				return new OthelloAlphaBetaPlayer_mwa29();
 			}

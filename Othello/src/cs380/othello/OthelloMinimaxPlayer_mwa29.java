@@ -5,7 +5,7 @@ public class OthelloMinimaxPlayer_mwa29 extends OthelloPlayer {
 	/**
 	 * Indicates infinite max depth
 	 */
-	public static final int INFINITE = 0;
+	public static final int INFINITE = -1;
 
 	/**
 	 * The maximum depth to recurse. Defaults to INFINITE.
