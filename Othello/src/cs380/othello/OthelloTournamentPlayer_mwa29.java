@@ -68,6 +68,9 @@ public class OthelloTournamentPlayer_mwa29 extends OthelloMinimaxPlayer_mwa29 {
 	/**
 	 * Performs minimax using tournament processing
 	 * 
+	 * Based on the pseudocode on the minimax Wikipedia page:
+	 * https://en.wikipedia.org/wiki/Minimax
+	 * 
 	 * @param state
 	 *            the current state
 	 * @param startTime

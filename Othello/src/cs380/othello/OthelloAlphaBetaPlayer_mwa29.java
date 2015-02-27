@@ -55,6 +55,9 @@ public class OthelloAlphaBetaPlayer_mwa29 extends OthelloMinimaxPlayer_mwa29 {
 	/**
 	 * Performs minimax using alpha-beta pruning
 	 * 
+	 * Based on the pseudocode on the Alpha-Beta Pruning Wikipedia page:
+	 * https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+	 * 
 	 * @param state
 	 *            the current state
 	 * @param currentDepth
