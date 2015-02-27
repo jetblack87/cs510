@@ -17,6 +17,8 @@ The available options are:
 The possible types for the players is:
 * random - uses the provided random player
 * minimax - uses the minimax player. Can supply optional 'maxdepth' by using the form "minimax:<maxDepth>" (example: minimax:3).
+* alphabeta (Extra Credit 2.A) - uses the minimax player with alphabeta pruning. Can supply optional 'maxdepth' by using the form "minimax:<maxDepth>" (example: alphabeta:5).
+* tournament (Extra Credit 2.B) - uses the minimax player for tournament. Can supply optional 'maxtime' (in milliseconds) by using the form "minimax:<maxTime>" (example: minimax:3).
 
 
 
