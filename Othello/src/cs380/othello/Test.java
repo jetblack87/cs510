@@ -75,7 +75,13 @@ public class Test {
 			if (numberArgument > Integer.MIN_VALUE) {
 				return new OthelloTournamentPlayer_mwa29(numberArgument);
 			} else {
-				return new OthelloAlphaBetaPlayer_mwa29();
+				return new OthelloTournamentPlayer_mwa29();
+			}
+		} else if (playerType.equals("alphabetaplus")) {
+			if (numberArgument > Integer.MIN_VALUE) {
+				return new OthelloAlphaBetaPlusPlayer_mwa29(numberArgument);
+			} else {
+				return new OthelloAlphaBetaPlusPlayer_mwa29();
 			}
 		} else {
 			throw new RuntimeException("Unknown type supplied: " + playerType);
