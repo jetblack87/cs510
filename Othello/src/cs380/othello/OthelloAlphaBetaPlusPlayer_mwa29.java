@@ -42,9 +42,11 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 				returnMove = a;
 				returnMoveScore = Helper.playerScoreValue(
 						state.nextPlayerToMove,
-						state.applyMoveCloning(returnMove).score());
+						evaluation(state.applyMoveCloning(returnMove),
+								state.otherPlayer(state.nextPlayerToMove)));
 			} else {
-				final int nextMoveScore = alphabeta(state, maxDepth,
+				final int nextMoveScore = alphabeta(state,
+						state.otherPlayer(state.nextPlayerToMove), maxDepth,
 						Integer.MIN_VALUE, Integer.MAX_VALUE, false);
 
 				if (nextMoveScore > returnMoveScore) {
@@ -65,6 +67,8 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 	 * 
 	 * @param state
 	 *            the current state
+	 * @param currentPlayer
+	 *            the current player
 	 * @param currentDepth
 	 *            the current depth
 	 * @param alpha
@@ -75,18 +79,18 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 	 *            whether this is being called for the maximizing player
 	 * @return the heuristic score
 	 */
-	private int alphabeta(OthelloState state, int currentDepth, int alpha,
-			int beta, boolean maximizingPlayer) {
+	private int alphabeta(OthelloState state, int currentPlayer,
+			int currentDepth, int alpha, int beta, boolean maximizingPlayer) {
 		if (currentDepth == 0 || state.gameOver()) {
-			return evaluation(state);
+			return evaluation(state, currentPlayer);
 		}
 		if (maximizingPlayer) {
 			int v = Integer.MIN_VALUE;
 			for (final OthelloMove a : state.generateMoves()) {
 				v = Helper.Integer_max(
 						v,
-						alphabeta(state.applyMoveCloning(a), currentDepth - 1,
-								alpha, beta, false));
+						alphabeta(state.applyMoveCloning(a), currentPlayer,
+								currentDepth - 1, alpha, beta, false));
 				alpha = Helper.Integer_max(alpha, v);
 				if (beta <= alpha) {
 					break;
@@ -98,8 +102,8 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 			for (final OthelloMove a : state.generateMoves()) {
 				v = Helper.Integer_min(
 						v,
-						alphabeta(state.applyMoveCloning(a), currentDepth - 1,
-								alpha, beta, true));
+						alphabeta(state.applyMoveCloning(a), currentPlayer,
+								currentDepth - 1, alpha, beta, true));
 				beta = Helper.Integer_min(beta, v);
 				if (beta <= alpha) {
 					break;
@@ -124,16 +128,13 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 	 * 
 	 * @param state
 	 *            the state to evaluate
+	 * @param currentPlayer
+	 *            the current player
 	 * @return the heuristic number based on this evaluation
 	 */
-	private int evaluation(OthelloState state) {
+	private int evaluation(OthelloState state, int currentPlayer) {
 		int evalue = 0;
-		int currentPlayer = OthelloState.PLAYER1;
-		int otherPlayer = OthelloState.PLAYER2;
-		if (OthelloState.PLAYER1 == state.nextPlayerToMove) {
-			currentPlayer = OthelloState.PLAYER2;
-			otherPlayer = OthelloState.PLAYER1;
-		}
+		int otherPlayer = state.otherPlayer(currentPlayer);
 
 		evalue += numberOfStableDiscs(state, currentPlayer);
 		evalue -= numberOfStableDiscs(state, otherPlayer);
@@ -173,26 +174,26 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 		cSquares.add(new Point(boardSize - 2, boardSize - 1)); // g8
 		cSquares.add(new Point(boardSize - 1, 1)); // h2
 		cSquares.add(new Point(boardSize - 1, boardSize - 2)); // h7
-		
-		List<Point> xSquares = new ArrayList<Point>();		
+
+		List<Point> xSquares = new ArrayList<Point>();
 		xSquares.add(new Point(1, 1)); // b2
 		xSquares.add(new Point(1, boardSize - 2)); // b7
 		xSquares.add(new Point(boardSize - 2, 1)); // g2
 		xSquares.add(new Point(boardSize - 2, boardSize - 2)); // g7
-		
+
 		int count = 0;
-		
+
 		for (Point p : cSquares) {
 			if (board[p.x][p.y] == currentPlayer) {
-				count ++;
+				count++;
 			}
 		}
 		for (Point p : xSquares) {
 			if (board[p.x][p.y] == currentPlayer) {
-				count ++;
+				count++;
 			}
 		}
-		
+
 		return 0;
 	}
 
@@ -268,9 +269,6 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 			}
 		case EAST:
 		case WEST:
-			if (j == 7) {
-				System.out.println("AAAA");
-			}
 			if (otherPlayer == board[i][j - 1]
 					&& otherPlayer == board[i][j + 1]) {
 				return true;
