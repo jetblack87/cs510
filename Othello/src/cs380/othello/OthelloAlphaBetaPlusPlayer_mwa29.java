@@ -8,6 +8,13 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 		OthelloMinimaxPlayer_mwa29 {
 
 	/**
+	 * Enum used to indicate if a position is an edge
+	 */
+	private static enum Edge {
+		NOT_EDGE, NORTH, EAST, SOUTH, WEST
+	};
+
+	/**
 	 * The default constructor
 	 */
 	public OthelloAlphaBetaPlusPlayer_mwa29() {
@@ -43,11 +50,11 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 				returnMoveScore = Helper.playerScoreValue(
 						state.nextPlayerToMove,
 						evaluation(state.applyMoveCloning(returnMove),
-								state.otherPlayer(state.nextPlayerToMove)));
+								state.nextPlayerToMove));
 			} else {
 				final int nextMoveScore = alphabeta(state,
-						state.otherPlayer(state.nextPlayerToMove), maxDepth,
-						Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+						state.nextPlayerToMove, maxDepth, Integer.MIN_VALUE,
+						Integer.MAX_VALUE, false);
 
 				if (nextMoveScore > returnMoveScore) {
 					returnMove = a;
@@ -134,18 +141,20 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 	 */
 	private int evaluation(OthelloState state, int currentPlayer) {
 		int evalue = 0;
-		int otherPlayer = state.otherPlayer(currentPlayer);
+		final int otherPlayer = state.otherPlayer(currentPlayer);
 
 		evalue += numberOfStableDiscs(state, currentPlayer);
 		evalue -= numberOfStableDiscs(state, otherPlayer);
 		evalue -= numberOfCAndXSquares(state, currentPlayer);
-		evalue += numberOfCAndXSquares(state, currentPlayer);
+		evalue += numberOfCAndXSquares(state, otherPlayer);
 		evalue += mobility(state, currentPlayer);
 		evalue -= numberOfFrontierDiscs(state, currentPlayer);
+		evalue += numberOfFrontierDiscs(state, otherPlayer);
 		evalue += tempo(state, currentPlayer);
 		evalue += parity(state, currentPlayer);
 		evalue += unbalancedEdged(state, currentPlayer);
 		evalue += stonerTraps(state, currentPlayer);
+		evalue += Helper.playerScoreValue(currentPlayer, state.score());
 
 		return evalue;
 	}
@@ -194,7 +203,7 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 			}
 		}
 
-		return 0;
+		return count;
 	}
 
 	private int numberOfStableDiscs(OthelloState state, int player) {
@@ -209,6 +218,44 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 			}
 		}
 		return count;
+	}
+
+	/**
+	 * The number of available moves for the current player
+	 * 
+	 * @param state
+	 *            the current state
+	 * @param player
+	 *            the current player
+	 * @return the number of available moves for the current player
+	 */
+	private int mobility(OthelloState state, int player) {
+		return state.generateMoves(player).size();
+	}
+
+	private int numberOfFrontierDiscs(OthelloState state, int player) {
+		// TODO FUTURE
+		return 0;
+	}
+
+	private int tempo(OthelloState state, int player) {
+		// TODO FUTURE
+		return 0;
+	}
+
+	private int parity(OthelloState state, int player) {
+		// TODO FUTURE
+		return 0;
+	}
+
+	private int unbalancedEdged(OthelloState state, int player) {
+		// TODO FUTURE
+		return 0;
+	}
+
+	private int stonerTraps(OthelloState state, int player) {
+		// TODO FUTURE
+		return 0;
 	}
 
 	/**
@@ -280,13 +327,6 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 	}
 
 	/**
-	 * Enum used to indicate if a position is an edge
-	 */
-	enum Edge {
-		NOT_EDGE, NORTH, EAST, SOUTH, WEST
-	};
-
-	/**
 	 * Returns true if this position is an edge.
 	 * 
 	 * @param board
@@ -339,41 +379,4 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 		return false;
 	}
 
-	/**
-	 * The number of available moves for the current player
-	 * 
-	 * @param state
-	 *            the current state
-	 * @param currentPlayer
-	 *            the current player
-	 * @return the number of available moves for the current player
-	 */
-	private int mobility(OthelloState state, int currentPlayer) {
-		return state.generateMoves(currentPlayer).size();
-	}
-
-	private int numberOfFrontierDiscs(OthelloState state, int currentPlayer) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private int tempo(OthelloState state, int currentPlayer) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private int parity(OthelloState state, int currentPlayer) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private int unbalancedEdged(OthelloState state, int currentPlayer) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private int stonerTraps(OthelloState state, int currentPlayer) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }
