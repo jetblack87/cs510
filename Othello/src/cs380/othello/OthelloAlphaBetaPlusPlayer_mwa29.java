@@ -44,23 +44,50 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 		OthelloMove returnMove = null;
 		int returnMoveScore = Integer.MIN_VALUE;
 
-		for (final OthelloMove a : state.generateMoves()) {
-			if (null == returnMove) {
-				returnMove = a;
-				returnMoveScore = Helper.playerScoreValue(
-						state.nextPlayerToMove,
-						evaluation(state.applyMoveCloning(returnMove),
-								state.nextPlayerToMove));
-			} else {
-				final int nextMoveScore = alphabeta(state,
-						state.nextPlayerToMove, maxDepth, Integer.MIN_VALUE,
-						Integer.MAX_VALUE, false);
-
-				if (nextMoveScore > returnMoveScore) {
+		int player = state.nextPlayerToMove;
+		switch (player) {
+		case OthelloState.PLAYER1:
+			for (final OthelloMove a : state.generateMoves()) {
+				if (null == returnMove) {
 					returnMove = a;
-					returnMoveScore = nextMoveScore;
+					returnMoveScore = Helper.playerScoreValue(
+							player,
+							evaluation(state.applyMoveCloning(returnMove),
+									player));
+				} else {
+					final int nextMoveScore = alphabeta(state, player,
+							maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE,
+							false);
+
+					if (nextMoveScore > returnMoveScore) {
+						returnMove = a;
+						returnMoveScore = nextMoveScore;
+					}
 				}
 			}
+
+			break;
+		case OthelloState.PLAYER2:
+			for (final OthelloMove a : state.generateMoves()) {
+				if (null == returnMove) {
+					returnMove = a;
+					returnMoveScore = Helper.playerScoreValue(
+							player,
+							evaluation(state.applyMoveCloning(returnMove),
+									player));
+				} else {
+					final int nextMoveScore = alphabeta(state, player,
+							maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE,
+							true);
+
+					if (nextMoveScore < returnMoveScore) {
+						returnMove = a;
+						returnMoveScore = nextMoveScore;
+					}
+				}
+			}
+
+			break;
 		}
 
 		return returnMove;
@@ -143,11 +170,18 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 		int evalue = 0;
 		final int otherPlayer = state.otherPlayer(currentPlayer);
 
-		evalue += numberOfStableDiscs(state, currentPlayer);
-		evalue -= numberOfStableDiscs(state, otherPlayer);
-		evalue -= numberOfCAndXSquares(state, currentPlayer);
-		evalue += numberOfCAndXSquares(state, otherPlayer);
-		evalue += mobility(state, currentPlayer);
+		final int STABLE_MOVES_WEIGHT = 10;
+		final int CX_SQAURES_WEIGHT = 5;
+		final int MOBILITY_WEIGHT = 1;
+
+		evalue += STABLE_MOVES_WEIGHT
+				* numberOfStableDiscs(state, currentPlayer);
+		evalue -= STABLE_MOVES_WEIGHT * numberOfStableDiscs(state, otherPlayer);
+		evalue -= CX_SQAURES_WEIGHT
+				* numberOfCAndXSquares(state, currentPlayer);
+		evalue += CX_SQAURES_WEIGHT * numberOfCAndXSquares(state, otherPlayer);
+		evalue += MOBILITY_WEIGHT * mobility(state, currentPlayer);
+		evalue -= MOBILITY_WEIGHT * mobility(state, otherPlayer);
 		evalue -= numberOfFrontierDiscs(state, currentPlayer);
 		evalue += numberOfFrontierDiscs(state, otherPlayer);
 		evalue += tempo(state, currentPlayer);
@@ -277,7 +311,7 @@ public class OthelloAlphaBetaPlusPlayer_mwa29 extends
 		} else if (isWedged(board, boardSize, i, j)) {
 			return true;
 		} else {
-			// TODO: Addition cases where a disc is stable
+			// TODO: Additional cases where a disc is stable
 		}
 		return false;
 	}
