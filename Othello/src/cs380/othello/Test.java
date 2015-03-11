@@ -83,6 +83,12 @@ public class Test {
 			} else {
 				return new OthelloAlphaBetaPlusPlayer_mwa29();
 			}
+		} else if (playerType.equals("montecarlo")) {
+			if (numberArgument > Integer.MIN_VALUE) {
+				return new MonteCarloPlayer_mwa29(numberArgument);
+			} else {
+				return new MonteCarloPlayer_mwa29();
+			}
 		} else {
 			throw new RuntimeException("Unknown type supplied: " + playerType);
 		}
