@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MonteCarloPlayer_mwa29 extends OthelloPlayer {
+public class OthelloMonteCarloPlayer_mwa29 extends OthelloPlayer {
 
 	private static final int DEFAULT_ITERATIONS = 5;
 	private int iterations;
 
 	private List<OthelloNode> foo;
 
-	public MonteCarloPlayer_mwa29() {
+	public OthelloMonteCarloPlayer_mwa29() {
 		this.iterations = DEFAULT_ITERATIONS;
 	}
 
-	public MonteCarloPlayer_mwa29(int iterations) {
+	public OthelloMonteCarloPlayer_mwa29(int iterations) {
 		this.iterations = iterations;
 	}
 
@@ -79,16 +79,16 @@ public class MonteCarloPlayer_mwa29 extends OthelloPlayer {
 		node.parent = null;
 		node.action = action;
 		node.children = new ArrayList<OthelloNode>();
-		for (OthelloMove move : state.generateMoves()) {
-			OthelloNode child = new OthelloNode();
-			child.state = state.applyMoveCloning(move);
-			child.parent = node;
-			child.children = null;
-			child.action = move;
-			child.g = 1;
-			child.score = child.state.score();
-			node.children.add(child);
-		}
+//		for (OthelloMove move : state.generateMoves()) {
+//			OthelloNode child = new OthelloNode();
+//			child.state = state.applyMoveCloning(move);
+//			child.parent = node;
+//			child.children = null;
+//			child.action = move;
+//			child.g = 1;
+//			child.score = child.state.score();
+//			node.children.add(child);
+//		}
 		return node;
 	}
 
@@ -151,10 +151,10 @@ public class MonteCarloPlayer_mwa29 extends OthelloPlayer {
 	 * 
 	 * If 'node' still has any children that are not in the tree, then it
 	 * generates one of those children ('newnode'), it adds 'newnode' as a child
-	 * to 'node', and returns ‘newnode’.
+	 * to 'node', and returns 'newnode'.
 	 * 
 	 * If 'node' is a terminal node (no actions can be performed). Then it
-	 * returns “node”
+	 * returns "node"
 	 * 
 	 * If 'node' is not a terminal but all its children are in the tree, then:
 	 * 90% of the times "nodetmp = bestChild(node)", and 10% of the times
