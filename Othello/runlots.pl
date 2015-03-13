@@ -25,7 +25,9 @@ foreach (my $i = 0; $i < $count; $i++) {
 	    }
 	}
     }
+    print '.';
 }
+print "\n";
 print "playerone wins: $playerone_wins\n";
 print "playertwo wins: $playertwo_wins\n";
 print "ties: $ties\n";
