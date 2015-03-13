@@ -150,6 +150,10 @@ public class OthelloMonteCarloPlayer_mwa29 extends OthelloPlayer {
 		OthelloNode returnNode = null;
 		List<OthelloMove> moves = node.state.generateMoves();
 
+		if (moves.isEmpty()) {
+			return node;
+		}
+		
 		for (OthelloMove move : moves) {
 			OthelloState moveState = node.state.applyMoveCloning(move);
 			OthelloNode newNode = createNode(moveState, move, node);
@@ -160,22 +164,19 @@ public class OthelloMonteCarloPlayer_mwa29 extends OthelloPlayer {
 			}
 		}
 
-		if (moves.isEmpty()) {
-			return node;
+		Random rand = new Random();
+		boolean ninetyPercent = (rand.nextInt(10) % 10 != 0);
+		OthelloNode nodetmp = null;
+		if (ninetyPercent) {
+			nodetmp = bestChild(node);
 		} else {
-			Random rand = new Random();
-			boolean ninetyPercent = (rand.nextInt(10) % 10 != 0);
-			OthelloNode nodetmp = null;
-			if (ninetyPercent) {
-				nodetmp = bestChild(node);
-			} else {
-				OthelloMove randMove = moves.get(rand.nextInt(moves.size()));
-				nodetmp = createNode(node.state.applyMoveCloning(randMove),
-						randMove, node);
-			}
-
-			returnNode = treePolicy(nodetmp);
+			OthelloMove randMove = moves.get(rand.nextInt(moves.size()));
+			nodetmp = createNode(node.state.applyMoveCloning(randMove),
+					randMove, node);
 		}
+
+		returnNode = treePolicy(nodetmp);
+
 		return returnNode;
 	}
 
