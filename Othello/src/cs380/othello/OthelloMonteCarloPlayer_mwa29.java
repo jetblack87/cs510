@@ -37,21 +37,28 @@ public class OthelloMonteCarloPlayer_mwa29 extends OthelloPlayer {
 		public boolean equals(Object obj) {
 			if (obj instanceof OthelloNode) {
 				OthelloNode that = (OthelloNode) obj;
-				return (null != this.state && null != that.state && this.state
-						.equals(that.state));
+				return (null != this.state && null != that.state && stateEquals(
+						this.state, that.state));
 			}
 			return false;
 		}
 	}
 
+	private static boolean stateEquals(OthelloState one, OthelloState two) {
+		for (int i = 0; i < one.boardSize; i++) {
+			for (int j = 0; j < one.boardSize; j++) {
+				if (one.board[i][j] != two.board[i][j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public OthelloMove getMove(OthelloState state) {
 		foo = new ArrayList<OthelloNode>();
-		return MonteCarloTreeSearch(state, iterations);
-	}
-
-	private OthelloMove MonteCarloTreeSearch(OthelloState state, int iterations) {
-		OthelloNode root = createNode(state, null);
+		OthelloNode root = createNode(state, null, null);
 		for (int i = 0; i < iterations; i++) {
 			OthelloNode node = treePolicy(root);
 			if (node != null) {
@@ -73,40 +80,14 @@ public class OthelloMonteCarloPlayer_mwa29 extends OthelloPlayer {
 	 *            the state
 	 * @return the best child
 	 */
-	private OthelloNode createNode(OthelloState state, OthelloMove action) {
-		OthelloNode node = new OthelloNode();
-		node.state = state;
-		node.parent = null;
-		node.action = action;
-		node.children = new ArrayList<OthelloNode>();
-//		for (OthelloMove move : state.generateMoves()) {
-//			OthelloNode child = new OthelloNode();
-//			child.state = state.applyMoveCloning(move);
-//			child.parent = node;
-//			child.children = null;
-//			child.action = move;
-//			child.g = 1;
-//			child.score = child.state.score();
-//			node.children.add(child);
-//		}
-		return node;
-	}
-
-	/**
-	 * Auxiliary function to createNode. Sets the new nodes parent to given
-	 * parent.
-	 * 
-	 * @param state
-	 *            the state
-	 * @param parent
-	 *            the parent
-	 * @return the best child
-	 */
 	private OthelloNode createNode(OthelloState state, OthelloMove action,
 			OthelloNode parent) {
-		OthelloNode returnNode = createNode(state, action);
-		returnNode.parent = parent;
-		return returnNode;
+		OthelloNode node = new OthelloNode();
+		node.state = state;
+		node.parent = parent;
+		node.action = action;
+		node.children = new ArrayList<OthelloNode>();
+		return node;
 	}
 
 	/**
@@ -182,12 +163,12 @@ public class OthelloMonteCarloPlayer_mwa29 extends OthelloPlayer {
 		if (moves.isEmpty()) {
 			return node;
 		} else {
-			boolean ninetyPercent = (Math.random() * 100 < 90);
+			Random rand = new Random();
+			boolean ninetyPercent = (rand.nextInt(10) % 10 != 0);
 			OthelloNode nodetmp = null;
 			if (ninetyPercent) {
 				nodetmp = bestChild(node);
 			} else {
-				Random rand = new Random();
 				OthelloMove randMove = moves.get(rand.nextInt(moves.size()));
 				nodetmp = createNode(node.state.applyMoveCloning(randMove),
 						randMove, node);
